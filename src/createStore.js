@@ -3,6 +3,8 @@ import $$observable from 'symbol-observable'
 import ActionTypes from './utils/actionTypes'
 import isPlainObject from './utils/isPlainObject'
 
+const Baobab = require('baobab')
+
 /**
  * Creates a Redux store that holds the state tree.
  * The only way to change the data in the store is to call `dispatch()` on it.
@@ -28,10 +30,10 @@ import isPlainObject from './utils/isPlainObject'
  * @returns {Store} A Redux store that lets you read the state, dispatch actions
  * and subscribe to changes.
  */
-export default function createStore(reducer, preloadedState, enhancer) {
+export default function createStore(reducer, preloadedState = {}, enhancer) {
   if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
     enhancer = preloadedState
-    preloadedState = undefined
+    preloadedState = {}
   }
 
   if (typeof enhancer !== 'undefined') {
@@ -47,10 +49,18 @@ export default function createStore(reducer, preloadedState, enhancer) {
   }
 
   let currentReducer = reducer
-  let currentState = preloadedState
+  let currentState = new Baobab(preloadedState)
   let currentListeners = []
   let nextListeners = currentListeners
   let isDispatching = false
+
+  currentState.on('update', () => {
+    const listeners = currentListeners = nextListeners
+    for (let i = 0; i < listeners.length; i++) {
+      const listener = listeners[i]
+      listener()
+    }
+  })
 
   function ensureCanMutateNextListeners() {
     if (nextListeners === currentListeners) {
@@ -72,7 +82,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
       )
     }
 
-    return currentState
+    return currentState.get()
   }
 
   /**
@@ -151,7 +161,7 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * example, see the documentation for the `redux-thunk` package. Even the
    * middleware will eventually dispatch plain object actions using this method.
    *
-   * @param {Object} action A plain object representing “what changed”. It is
+   * @param {Object} action A plain object representing ?what changed?. It is
    * a good idea to keep actions serializable so you can record and replay user
    * sessions, or use the time travelling `redux-devtools`. An action must have
    * a `type` property which may not be `undefined`. It is a good idea to use
@@ -186,12 +196,6 @@ export default function createStore(reducer, preloadedState, enhancer) {
       currentState = currentReducer(currentState, action)
     } finally {
       isDispatching = false
-    }
-
-    const listeners = currentListeners = nextListeners
-    for (let i = 0; i < listeners.length; i++) {
-      const listener = listeners[i]
-      listener()
     }
 
     return action
