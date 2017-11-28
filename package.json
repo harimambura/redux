@@ -1,6 +1,6 @@
 {
-  "name": "redux",
-  "version": "4.0.0-beta.1",
+  "name": "redux-baobab",
+  "version": "1.0.0",
   "description": "Predictable state container for JavaScript apps",
   "main": "lib/redux.js",
   "module": "es/redux.js",
@@ -72,6 +72,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
+    "baobab": "^2.5.0",
     "cross-env": "^5.1.0",
     "eslint": "^4.9.0",
     "eslint-config-react-app": "^2.0.1",
