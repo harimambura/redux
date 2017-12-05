@@ -59,6 +59,7 @@
   },
   "homepage": "http://redux.js.org",
   "dependencies": {
+    "baobab": "^2.5.0",
     "loose-envify": "^1.1.0",
     "symbol-observable": "^1.0.3"
   },
@@ -71,7 +72,6 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
-    "baobab": "^2.5.0",
     "cross-env": "^5.1.0",
     "eslint": "^4.9.0",
     "eslint-config-react-app": "^2.0.1",

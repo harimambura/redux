@@ -1,6 +1,8 @@
 import ActionTypes from './utils/actionTypes'
 import warning from './utils/warning'
 import isPlainObject from './utils/isPlainObject'
+import Baobab from 'baobab'
+
 
 function getUndefinedStateErrorMessage(key, action) {
   const actionType = action && action.type
@@ -131,7 +133,7 @@ export default function combineReducers(reducers) {
     shapeAssertionError = e
   }
 
-  return function combination(state = {}, action) {
+  return function combination(state = new Baobab(), action) {
     if (shapeAssertionError) {
       throw shapeAssertionError
     }
@@ -144,19 +146,16 @@ export default function combineReducers(reducers) {
     }
 
     let hasChanged = false
-    const nextState = {}
     for (let i = 0; i < finalReducerKeys.length; i++) {
       const key = finalReducerKeys[i]
       const reducer = finalReducers[key]
-      const previousStateForKey = state[key]
-      const nextStateForKey = reducer(previousStateForKey, action)
+      const cursorForKey = state.select(key)
+			const nextCursorForKey = reducer(cursorForKey, action)
       if (typeof nextStateForKey === 'undefined') {
         const errorMessage = getUndefinedStateErrorMessage(key, action)
         throw new Error(errorMessage)
       }
-      nextState[key] = nextStateForKey
-      hasChanged = hasChanged || nextStateForKey !== previousStateForKey
     }
-    return hasChanged ? nextState : state
+    return state
   }
 }
