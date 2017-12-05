@@ -1,7 +1,7 @@
 import ActionTypes from './utils/actionTypes'
 import warning from './utils/warning'
 import isPlainObject from './utils/isPlainObject'
-import Baobab from 'baobab'
+let Baobab =  require('baobab')
 
 
 function getUndefinedStateErrorMessage(key, action) {
