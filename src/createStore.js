@@ -3,8 +3,6 @@ import $$observable from 'symbol-observable'
 import ActionTypes from './utils/actionTypes'
 import isPlainObject from './utils/isPlainObject'
 
-const Baobab = require('baobab')
-
 /**
  * Creates a Redux store that holds the state tree.
  * The only way to change the data in the store is to call `dispatch()` on it.
@@ -30,10 +28,10 @@ const Baobab = require('baobab')
  * @returns {Store} A Redux store that lets you read the state, dispatch actions
  * and subscribe to changes.
  */
-export default function createStore(reducer, preloadedState = {}, enhancer) {
+export default function createStore(reducer, preloadedState, enhancer) {
   if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
     enhancer = preloadedState
-    preloadedState = {}
+    preloadedState = undefined
   }
 
   if (typeof enhancer !== 'undefined') {
@@ -49,18 +47,10 @@ export default function createStore(reducer, preloadedState = {}, enhancer) {
   }
 
   let currentReducer = reducer
-  let currentState = new Baobab(preloadedState)
+  let currentState = preloadedState
   let currentListeners = []
   let nextListeners = currentListeners
   let isDispatching = false
-
-  currentState.on('update', () => {
-    const listeners = currentListeners = nextListeners
-    for (let i = 0; i < listeners.length; i++) {
-      const listener = listeners[i]
-      listener()
-    }
-  })
 
   function ensureCanMutateNextListeners() {
     if (nextListeners === currentListeners) {
@@ -82,7 +72,7 @@ export default function createStore(reducer, preloadedState = {}, enhancer) {
       )
     }
 
-    return currentState.get()
+    return currentState
   }
 
   /**
@@ -172,6 +162,8 @@ export default function createStore(reducer, preloadedState = {}, enhancer) {
    * Note that, if you use a custom middleware, it may wrap `dispatch()` to
    * return something else (for example, a Promise you can await).
    */
+  var isNeedToSubscribe = true;
+
   function dispatch(action) {
     if (!isPlainObject(action)) {
       throw new Error(
@@ -196,6 +188,29 @@ export default function createStore(reducer, preloadedState = {}, enhancer) {
       currentState = currentReducer(currentState, action)
     } finally {
       isDispatching = false
+    }
+
+    var state = (currentState && currentState.committedState) || currentState;
+    var isBaobabInstance = state && state.get && (typeof state.get === 'function');
+
+    if (isNeedToSubscribe) {
+      if (isBaobabInstance) {
+        state.on('update', function () {
+          var listeners = currentListeners = nextListeners;
+          for (var i = 0; i < listeners.length; i++) {
+            var listener = listeners[i];
+            listener();
+          }
+        });
+      }
+      isNeedToSubscribe = false;
+    }
+    if (!isBaobabInstance) {
+      var listeners = currentListeners = nextListeners;
+      for (var i = 0; i < listeners.length; i++) {
+        var listener = listeners[i];
+        listener();
+      }
     }
 
     return action
