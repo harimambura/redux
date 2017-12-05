@@ -163,6 +163,8 @@ export default function createStore(reducer, preloadedState, enhancer) {
    * return something else (for example, a Promise you can await).
    */
   var isNeedToSubscribe = true;
+  var state = undefined;
+  var isBaobabInstance = false;
 
   function dispatch(action) {
     if (!isPlainObject(action)) {
@@ -190,10 +192,10 @@ export default function createStore(reducer, preloadedState, enhancer) {
       isDispatching = false
     }
 
-    var state = (currentState && currentState.committedState) || currentState;
-    var isBaobabInstance = state && state.get && (typeof state.get === 'function');
-
     if (isNeedToSubscribe) {
+      state = (currentState && currentState.committedState) || currentState;
+      isBaobabInstance = state && state.get && (typeof state.get === 'function');
+
       if (isBaobabInstance) {
         state.on('update', function () {
           var listeners = currentListeners = nextListeners;
