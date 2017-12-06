@@ -151,7 +151,7 @@ export default function combineReducers(reducers) {
       const reducer = finalReducers[key]
       const cursorForKey = state.select(key)
 			const nextCursorForKey = reducer(cursorForKey, action)
-      if (typeof nextStateForKey === 'undefined') {
+			if (typeof nextCursorForKey === 'undefined') {
         const errorMessage = getUndefinedStateErrorMessage(key, action)
         throw new Error(errorMessage)
       }
