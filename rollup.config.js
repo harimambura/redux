@@ -27,11 +27,11 @@ if (env === 'development' || env === 'production') {
     nodeResolve({
       jsnext: true
 		}),
-		commonjs({}),
     babel({
-      exclude: 'node_modules/**',
+			exclude: 'node_modules/**',
       plugins: ['external-helpers'],
     }),
+		commonjs({}),
     replace({
       'process.env.NODE_ENV': JSON.stringify(env)
     })
