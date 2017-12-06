@@ -1,4 +1,5 @@
 import nodeResolve from 'rollup-plugin-node-resolve'
+import commonjs from 'rollup-plugin-commonjs'
 import babel from 'rollup-plugin-babel'
 import replace from 'rollup-plugin-replace'
 import uglify from 'rollup-plugin-uglify'
@@ -25,7 +26,8 @@ if (env === 'development' || env === 'production') {
   config.plugins.push(
     nodeResolve({
       jsnext: true
-    }),
+		}),
+		commonjs({}),
     babel({
       exclude: 'node_modules/**',
       plugins: ['external-helpers'],
