@@ -1,6 +1,6 @@
 {
   "name": "redux-baobab",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Predictable state container for JavaScript apps",
   "main": "lib/redux.js",
   "module": "es/redux.js",
